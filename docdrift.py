@@ -114,9 +114,22 @@ Rules:
    - "code_change_summary": which file/line in code caused this
    - "suggested_fix": updated documentation line
 """
+# Groq se automatically active chat model nikalna
+    available_models = [
+        m.id for m in client.models.list().data
+        if not any(x in m.id.lower() for x in ["whisper", "tts", "guard", "audio", "embed", "compound"])
+    ]
+    selected_model = available_models[0]
+    print(f"🤖 Auto-selected Groq model: {selected_model}")
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model= selected_model,
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.0
+    )
+    response = client.chat.completions.create(
+        model=selected_model,
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.0
